@@ -768,6 +768,7 @@ extern "C" int errno;
 register unsigned char * stack_ptr __asm ("sp");
 
 // Dynamic memory allocation related syscall.
+#ifndef TARGET_XMC4500_RELAXKIT
 #if defined(TARGET_NUMAKER_PFM_NUC472) || defined(TARGET_NUMAKER_PFM_M453)
 // Overwrite _sbrk() to support two region model (heap and stack are two distinct regions).
 // __wrap__sbrk() is implemented in:
@@ -803,6 +804,7 @@ extern "C" caddr_t _sbrk(int incr) {
     heap = new_heap;
     return (caddr_t) prev_heap;
 }
+#endif
 #endif
 #endif
 

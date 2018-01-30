@@ -22,9 +22,9 @@
 extern "C" {
 #endif
 
-#define STDIO_UART_TX     p5_1
-#define STDIO_UART_RX     p1_5
-#define STDIO_UART        UART_1
+#define STDIO_UART_TX     USBTX
+#define STDIO_UART_RX     USBRX
+#define STDIO_UART        &VirtualSerial_CDC_Interface
 
 typedef enum {
     UART_1 = 0x40030000UL,

@@ -315,13 +315,21 @@ Reset_Handler:
 	b	.L_loop2
 .L_loop2_done:    
 #endif /* __SKIP_BSS_CLEAR */
-   
+
+	ldr	 r0, =software_init_hook
+	cmp  r0, #0
+	beq  __main_start__
+	b __main_end__
+
+__main_start__:
 #ifndef __SKIP_LIBC_INIT_ARRAY
     ldr  r0, =__libc_init_array
     blx  r0
 #endif
 
     ldr  r0, =main
+__main_end__:
+
     blx  r0
 
 .align 2

@@ -1,15 +1,15 @@
 /**
  * @file XMC4500x1024.ld
- * @date 2016-03-08
+ * @date 2017-04-20
  *
  * @cond
  *********************************************************************************************************************
- * Linker file for the GNU C Compiler v1.7
+ * Linker file for the GNU C Compiler v1.8
  * Supported devices: XMC4500-E144x1024
  *                    XMC4500-F144x1024
  *                    XMC4500-F100x1024
  *
- * Copyright (c) 2015-2016, Infineon Technologies AG
+ * Copyright (c) 2015-2017, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -49,7 +49,13 @@
  * 2016-03-08:
  *     - Fix size of BSS and DATA sections to be multiple of 4
  *     - Add assertion to check that region DSRAM_1_system does not overflowed no_init section 
- *      
+ *     
+ * 2017-04-07:
+ *     - Added new symbols __text_size and eText
+ *
+ * 2017-04-20:
+ *     - Change vtable location to flash area to save ram             
+ *
  * @endcond 
  *
  */
@@ -63,7 +69,7 @@ MEMORY
     FLASH_1_cached(RX) : ORIGIN = 0x08000000, LENGTH = 0x100000
     FLASH_1_uncached(RX) : ORIGIN = 0x0C000000, LENGTH = 0x100000
     PSRAM_1(!RX) : ORIGIN = 0x10000000, LENGTH = 0x10000
-    DSRAM_1_system(!RX) : ORIGIN = 0x20000200, LENGTH = 0x10000 - 0x200
+    DSRAM_1_system(!RX) : ORIGIN = 0x20000000, LENGTH = 0x10000
     DSRAM_2_comm(!RX) : ORIGIN = 0x30000000, LENGTH = 0x8000
 }
 
@@ -101,21 +107,35 @@ SECTIONS
         *(.rodata .rodata.*)
         *(.gnu.linkonce.r*)
         
+        *(vtable)        
+    
         . = ALIGN(4);        
     } > FLASH_1_cached AT > FLASH_1_uncached
 
+    .eh_frame_hdr : ALIGN (4)
+    {
+      KEEP (*(.eh_frame_hdr))
+    } > FLASH_1_cached AT > FLASH_1_uncached
+  
+    .eh_frame : ALIGN (4)
+    {
+      KEEP (*(.eh_frame))
+    } > FLASH_1_cached AT > FLASH_1_uncached
+
     /* Exception handling, exidx needs a dedicated section */
-    .ARM.extab :
+    .ARM.extab : ALIGN (4)
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
     } > FLASH_1_cached AT > FLASH_1_uncached
 
+    . = ALIGN(4);
     __exidx_start = .;
-    .ARM.exidx :
+    .ARM.exidx : ALIGN (4)
     {
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
     } > FLASH_1_cached AT > FLASH_1_uncached
     __exidx_end = .;
+    . = ALIGN(4);
 
     /* DSRAM layout (Lowest to highest)*/
 
@@ -231,6 +251,9 @@ SECTIONS
     } > DSRAM_2_comm AT > FLASH_1_uncached
     __data2_load = LOADADDR(DSRAM2_DATA);
     __data2_size = __data2_end - __data2_start;
+
+    __text_size = (__exidx_end - sText) + __data_size + __ram_code_size + __data2_size + __data3_size;
+    eText = sText + __text_size;
 
     DSRAM2_BSS (NOLOAD) :
     {

@@ -35,6 +35,8 @@
 
 #define MBED_VERSION MBED_ENCODE_VERSION(MBED_MAJOR_VERSION, MBED_MINOR_VERSION, MBED_PATCH_VERSION)
 
+#include "cmsis.h"
+
 #if MBED_CONF_RTOS_PRESENT
 #include "rtos/rtos.h"
 #endif

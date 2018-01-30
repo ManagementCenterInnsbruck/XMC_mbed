@@ -1,12 +1,12 @@
 /*********************************************************************************************************************
  * @file     system_XMC4500.c
  * @brief    CMSIS Cortex-M4 Device Peripheral Access Layer Header File for the Infineon XMC4500 Device Series
- * @version  V3.1.1
- * @date     01. Jun 2016
+ * @version  V3.1.2
+ * @date     09. Feb 2017
  *
  * @cond
  *********************************************************************************************************************
- * Copyright (c) 2014-2016, Infineon Technologies AG
+ * Copyright (c) 2014-2017, Infineon Technologies AG
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
@@ -36,6 +36,7 @@
  ********************** Version History ***************************************
  * V3.1.0, Dec 2014, Added options to configure clock settings
  * V3.1.1, 01. Jun 2016, Fix masking of OSCHPCTRL value 
+ * V3.1.2, 09. Feb 2017, Fix activation of USBPLL when SDMMC clock is enabled
  ******************************************************************************
  * @endcond
  */
@@ -280,6 +281,9 @@
     (((ENABLE_SCUCLK & SCU_CLK_CLKSET_USBCEN_Msk) != 0) && ((USBCLKDIV & SCU_CLK_USBCLKCR_USBSEL_Msk) == SCU_CLK_USBCLKCR_USBSEL_PLL)) || \
     (((ENABLE_SCUCLK & SCU_CLK_CLKSET_WDTCEN_Msk) != 0) && ((WDTCLKDIV & SCU_CLK_WDTCLKCR_WDTSEL_Msk) == SCU_CLK_WDTCLKCR_WDTSEL_PLL))
 
+#define ENABLE_USBPLL \
+    ((((ENABLE_SCUCLK & SCU_CLK_CLKSET_USBCEN_Msk) != 0) && ((USBCLKDIV & SCU_CLK_USBCLKCR_USBSEL_Msk) == SCU_CLK_USBCLKCR_USBSEL_USBPLL)) ||\
+     (((ENABLE_SCUCLK & SCU_CLK_CLKCLR_ENABLE_MMCCLK) != 0) && ((USBCLKDIV & SCU_CLK_USBCLKCR_USBSEL_Msk) == SCU_CLK_USBCLKCR_USBSEL_USBPLL)))
 /*
 // </h>
 */
@@ -551,7 +555,7 @@ __WEAK void SystemCoreClockSetup(void)
   SCU_TRAP->TRAPCLR = SCU_TRAP_TRAPCLR_SOSCWDGT_Msk | SCU_TRAP_TRAPCLR_SVCOLCKT_Msk;
 #endif /* ENABLE_PLL */
 
-#if (((ENABLE_SCUCLK & SCU_CLK_CLKSET_USBCEN_Msk) != 0) && ((USBCLKDIV & SCU_CLK_USBCLKCR_USBSEL_Msk) == SCU_CLK_USBCLKCR_USBSEL_USBPLL))
+#if ENABLE_USBPLL
   /* enable USB PLL first */
   SCU_PLL->USBPLLCON &= ~(SCU_PLL_USBPLLCON_VCOPWD_Msk | SCU_PLL_USBPLLCON_PLLPWD_Msk);
 

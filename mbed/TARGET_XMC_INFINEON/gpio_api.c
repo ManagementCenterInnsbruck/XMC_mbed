@@ -60,7 +60,7 @@ void gpio_init_in_ex(gpio_t* gpio, PinName pin, PinMode mode)
 
 void gpio_mode(gpio_t *obj, PinMode mode)
 {
-	XMC_GPIO_MODE_t xmc_mode = XMC_GPIO_MODE_INPUT_TRISTATE;
+	XMC_GPIO_MODE_t xmc_mode;
 
 	switch (mode)
 	{

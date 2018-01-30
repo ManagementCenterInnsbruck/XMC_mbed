@@ -179,12 +179,12 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 		gpio_init_port(&tx_gpio, obj_s->tx_pin);
 
 		XMC_GPIO_Init(tx_gpio.port, tx_gpio.pin, &tx_pin_config);
+	}
 
-		if (obj_s->uart == STDIO_UART)
-		{
-			stdio_uart_inited = 1;
-			memcpy(&stdio_uart, obj, sizeof(serial_t));
-		}
+	if (obj_s->uart == (UARTName)STDIO_UART)
+	{
+		stdio_uart_inited = 1;
+		memcpy(&stdio_uart, obj, sizeof(serial_t));
 	}
 }
 
