@@ -20,7 +20,7 @@ void gpio_mode(gpio_t *obj, PinMode mode)
 {
 	if (obj->dir == PIN_INPUT)
 	{
-		XMC_GPIO_MODE_t xmc_mode;
+		XMC_GPIO_MODE_t xmc_mode = XMC_GPIO_MODE_INPUT_TRISTATE;
 
 		switch (mode)
 		{

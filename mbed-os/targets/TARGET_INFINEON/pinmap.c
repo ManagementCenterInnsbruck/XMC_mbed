@@ -57,7 +57,7 @@ void pin_mode(PinName pin, PinMode mode)
     gpio_t gpio;
     gpio_init(&gpio, pin);
 
-    XMC_GPIO_MODE_t xmc_mode;
+    XMC_GPIO_MODE_t xmc_mode = XMC_GPIO_MODE_INPUT_TRISTATE;
 
     switch(mode)
     {
